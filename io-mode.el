@@ -245,20 +245,22 @@
                     ;; all comments ...
                     (replace-regexp-in-string io-comments-re "" str)))))
 
-(defun io-repl ()
+(defun io-repl (&optional print-message)
   "Launch an Io REPL using `io-command' as an inferior mode."
-  (interactive)
+  (interactive "p")
   (let ((io-repl-buffer (get-buffer "*Io*")))
     (unless (comint-check-proc io-repl-buffer)
       (setq io-repl-buffer
             (apply 'make-comint "Io" io-command nil)))
-    (pop-to-buffer io-repl-buffer)))
+    (if print-message
+        (pop-to-buffer io-repl-buffer)
+      io-repl-buffer)))
 
 (defun io-repl-sexp (str)
   "Send the expression to an Io REPL."
   (interactive "sExpression: ")
-  (let ((io-repl-buffer (io-repl)))
-    (save-current-buffer
+  (save-current-buffer
+    (let ((io-repl-buffer (io-repl)))
       (set-buffer io-repl-buffer)
       (comint-goto-process-mark)
       (insert (io-normalize-sexp str))
